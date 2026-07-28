@@ -228,7 +228,7 @@ export const StoryGeneratorModal: React.FC<StoryGeneratorModalProps> = ({
                 onUpdateSticker={handleUpdateSticker}
               />
 
-              {/* Top Watermark & 3D Badge */}
+              {/* Top Watermark & Badge */}
               <div className="relative z-10 flex items-center justify-between">
                 <div className="flex items-center gap-2 bg-white/70 backdrop-blur-md px-3 py-1 rounded-full border border-white/60 shadow-md">
                   <img 
@@ -237,18 +237,18 @@ export const StoryGeneratorModal: React.FC<StoryGeneratorModalProps> = ({
                     className="w-4 h-4 rounded-full object-contain"
                   />
                   <span className="font-mono-caps text-[9px] font-bold tracking-widest text-[#0f172a] uppercase">
-                    UNSAID ANONYME
+                    TCHAT ANONYME
                   </span>
                 </div>
 
                 <div className="bg-black/40 backdrop-blur-md text-white px-2.5 py-0.5 rounded-full text-[9px] font-mono-caps tracking-wider border border-white/20">
-                  3D STORY
+                  STORY TCHAT
                 </div>
               </div>
 
               {/* Main Content Area */}
               <div className="relative z-10 my-auto space-y-3.5">
-                {/* Received Question Card (3D Floating Glass Box) */}
+                {/* Received Question Card */}
                 <div 
                   style={{ 
                     backgroundColor: themeConfig.cardBg,
@@ -256,9 +256,9 @@ export const StoryGeneratorModal: React.FC<StoryGeneratorModalProps> = ({
                   }}
                   className="p-5 rounded-2xl border shadow-xl relative backdrop-blur-md transform transition-all"
                 >
-                  <div className="absolute -top-3 left-4 bg-gradient-to-r from-[#2563eb] to-[#7c3aed] text-white px-2.5 py-0.5 rounded-full text-[9px] font-mono-caps font-bold tracking-wider shadow-md flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[10px]">lock</span>
-                    MESSAGE SECRET
+                  <div className="absolute -top-3 left-4 bg-gradient-to-r from-[#2563eb] to-[#7c3aed] text-white px-2.5 py-0.5 rounded-full text-[9px] font-mono-caps font-bold tracking-wider shadow-md flex items-center gap-1.5">
+                    <span>🔒</span>
+                    <span>MESSAGE SECRET</span>
                   </div>
 
                   <p className="font-display italic text-base sm:text-lg leading-snug pt-1 text-black">
@@ -282,15 +282,15 @@ export const StoryGeneratorModal: React.FC<StoryGeneratorModalProps> = ({
                 </div>
               </div>
 
-              {/* 3D Instagram/WhatsApp Sticker at Bottom */}
+              {/* Instagram/WhatsApp Sticker at Bottom */}
               <div className="relative z-10 pt-2 flex flex-col items-center text-center">
                 <div className="bg-white text-black px-4 py-2 rounded-2xl shadow-xl border-2 border-white/80 flex items-center gap-2 transform -rotate-1 hover:rotate-0 transition-transform">
-                  <div className="w-6 h-6 rounded-full bg-[#2563eb] text-white flex items-center justify-center shadow-xs">
-                    <span className="material-symbols-outlined text-xs">link</span>
+                  <div className="w-6 h-6 rounded-full bg-[#2563eb] text-white flex items-center justify-center shadow-xs font-bold text-xs">
+                    🔗
                   </div>
                   <div className="text-left">
                     <p className="font-mono-caps text-[8px] text-[#5e5e5b] tracking-wider uppercase font-bold">
-                      POUR ME RÉPONDRE
+                      POUR ME RÉPONDRE (LIEN EN LÉGENDE)
                     </p>
                     <p className="font-display font-bold text-xs tracking-tight text-[#0f172a]">
                       {userLink}
@@ -317,30 +317,29 @@ export const StoryGeneratorModal: React.FC<StoryGeneratorModalProps> = ({
                   className="w-full max-w-[260px] aspect-[9/16] rounded-2xl shadow-2xl object-contain mx-auto border border-slate-200 bg-black/5"
                 />
                 <p className="text-[10px] text-[#5e5e5b] font-mono-caps uppercase mt-2 text-center">
-                  💡 Astuce : Appuyez longuement sur l'image ci-dessus pour l'enregistrer dans vos photos
+                  💡 Astuce : Téléchargez l'image ou appuyez dessus pour l'enregistrer dans vos photos
                 </p>
               </div>
 
-              {/* Instructions for WhatsApp Status */}
+              {/* Instructions & Explanation for Status Links */}
               <div className="bg-slate-900 text-white p-4 rounded-2xl space-y-3">
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[#25D366] text-xl">camera</span>
+                  <span className="material-symbols-outlined text-[#25D366] text-xl">chat</span>
                   <h4 className="font-display font-bold text-xs uppercase tracking-wider text-white">
-                    3 Étapes pour publier sur WhatsApp Statut :
+                    Comment partager avec un lien cliquable ?
                   </h4>
                 </div>
-                <div className="space-y-2 text-xs font-body text-slate-300">
+                <div className="space-y-2.5 text-xs font-body text-slate-300">
+                  <p className="text-[11px] leading-relaxed text-slate-300 bg-slate-800 p-2.5 rounded-xl border border-slate-700">
+                    ℹ️ Les photos de statut ne sont pas des liens cliquables par nature.
+                  </p>
                   <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-[#25D366] text-slate-950 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">1</span>
-                    <p><strong className="text-white">Téléchargez l'image</strong> ci-dessus dans la galerie de votre téléphone.</p>
+                    <p><strong className="text-white">WhatsApp Statut Texte :</strong> Cliquez sur <em>"Partager le lien cliquable sur WhatsApp"</em> ci-dessous pour publier un statut avec le lien direct cliquable !</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-[#25D366] text-slate-950 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">2</span>
-                    <p><strong className="text-white">Lien secret copié :</strong> <span className="text-pink-300 font-mono text-[11px] underline break-all">{publicUrl}</span></p>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="w-5 h-5 rounded-full bg-[#25D366] text-slate-950 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">3</span>
-                    <p>Ouvrez <strong className="text-white">WhatsApp &gt; Statut</strong>, touchez l'icône <strong className="text-white">Appareil Photo</strong>, sélectionnez cette image et collez votre lien !</p>
+                    <p><strong className="text-white">Photo / Insta :</strong> Téléchargez la photo et collez le lien secret <span className="text-pink-300 font-mono text-[11px] underline break-all">{publicUrl}</span> en légende !</p>
                   </div>
                 </div>
               </div>
@@ -348,16 +347,27 @@ export const StoryGeneratorModal: React.FC<StoryGeneratorModalProps> = ({
               {/* Action Buttons */}
               <div className="space-y-2">
                 <button
+                  onClick={() => {
+                    const text = encodeURIComponent(`✨ Question : "${message.text}"\n💬 Ma réponse : ${replyText}\n👉 Pose-moi une question ici :\n${publicUrl}`);
+                    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+                  }}
+                  className="w-full bg-[#25D366] text-slate-950 py-3.5 rounded-2xl font-display font-extrabold text-xs flex items-center justify-center gap-2 hover:bg-[#20bd5a] active:scale-98 transition-all shadow-md text-center"
+                >
+                  <span className="material-symbols-outlined text-xl">share</span>
+                  <span>📲 PARTAGER LE LIEN CLIQUABLE SUR WHATSAPP</span>
+                </button>
+
+                <button
                   onClick={() => downloadImageDataUrl(generatedImageDataUrl, `tchat-reply-${user.username}-${Date.now()}.png`)}
-                  className="w-full bg-[#25D366] text-slate-950 py-3.5 rounded-2xl font-display font-bold text-xs flex items-center justify-center gap-2 hover:bg-[#20bd5a] active:scale-98 transition-all shadow-md text-center"
+                  className="w-full bg-white text-slate-900 border-2 border-slate-900 py-3 rounded-2xl font-display font-bold text-xs flex items-center justify-center gap-2 hover:bg-slate-100 transition-colors"
                 >
                   <span className="material-symbols-outlined text-lg">download</span>
-                  <span>TÉLÉCHARGER MON IMAGE STORY (PNG HD)</span>
+                  <span>TÉLÉCHARGER L'IMAGE STORY (PNG HD)</span>
                 </button>
 
                 <button
                   onClick={handleCopyLink}
-                  className="w-full bg-slate-800 text-white py-3 rounded-2xl font-display font-bold text-xs flex items-center justify-center gap-2 hover:bg-slate-700 transition-colors"
+                  className="w-full bg-slate-800 text-white py-2.5 rounded-xl font-display font-bold text-xs flex items-center justify-center gap-2 hover:bg-slate-700 transition-colors"
                 >
                   <span className="material-symbols-outlined text-base">content_copy</span>
                   <span>{copiedLink ? '✓ LIEN COPIÉ DANS LE PRESSE-PAPIER' : 'COPIER LE LIEN SECRET'}</span>
@@ -365,7 +375,7 @@ export const StoryGeneratorModal: React.FC<StoryGeneratorModalProps> = ({
 
                 <button
                   onClick={() => setGeneratedImageDataUrl(null)}
-                  className="w-full bg-slate-100 text-slate-700 py-2.5 rounded-xl font-display font-semibold text-xs hover:bg-slate-200 transition-colors"
+                  className="w-full text-slate-500 py-2 font-display font-medium text-xs hover:text-slate-900 transition-colors"
                 >
                   Modifier le thème ou la réponse
                 </button>

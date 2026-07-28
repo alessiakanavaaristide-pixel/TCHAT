@@ -126,7 +126,7 @@ export const InviteStoryModal: React.FC<InviteStoryModalProps> = ({ user, onClos
             <span className="material-symbols-outlined text-2xl text-[#25D366]">photo_camera</span>
             <div>
               <h2 className="font-display font-bold text-base text-[#1c1b1b]">
-                Générateur de Carte Statut NGL
+                Générateur de Story TCHAT
               </h2>
               <p className="font-body text-[11px] text-[#5e5e5b]">Format 9:16 stylisé pour WhatsApp & Insta</p>
             </div>
@@ -268,11 +268,11 @@ export const InviteStoryModal: React.FC<InviteStoryModalProps> = ({ user, onClos
                 </div>
 
                 <div className="bg-black/50 backdrop-blur-md text-white px-2.5 py-0.5 rounded-full text-[8px] font-mono-caps tracking-widest border border-white/20">
-                  STATUT NGL
+                  STATUT TCHAT
                 </div>
               </div>
 
-              {/* Center Prompt Box (Stylized NGL Question Card) */}
+              {/* Center Prompt Box (Stylized TCHAT Question Card) */}
               <div className="relative z-10 my-auto">
                 <div 
                   style={{ 
@@ -281,9 +281,9 @@ export const InviteStoryModal: React.FC<InviteStoryModalProps> = ({ user, onClos
                   }}
                   className="p-5 rounded-2xl border shadow-2xl relative backdrop-blur-md text-center transform hover:scale-[1.02] transition-transform"
                 >
-                  <div className="inline-flex items-center gap-1 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 text-white px-3 py-1 rounded-full text-[10px] font-mono-caps font-bold tracking-wider shadow-md mb-3 uppercase">
-                    <span className="material-symbols-outlined text-[12px]">lock</span>
-                    MESSAGE ANONYME
+                  <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 text-white px-3 py-1 rounded-full text-[10px] font-mono-caps font-bold tracking-wider shadow-md mb-3 uppercase">
+                    <span>🔒</span>
+                    <span>MESSAGE ANONYME</span>
                   </div>
 
                   <p className="font-display font-bold text-lg sm:text-xl leading-snug text-black drop-shadow-xs">
@@ -299,12 +299,12 @@ export const InviteStoryModal: React.FC<InviteStoryModalProps> = ({ user, onClos
               {/* Bottom Sticker Box */}
               <div className="relative z-10 pt-2 flex flex-col items-center text-center">
                 <div className="bg-white text-black px-4 py-2 rounded-2xl shadow-xl border-2 border-white/90 flex items-center gap-2 transform -rotate-1 hover:rotate-0 transition-transform">
-                  <div className="w-6 h-6 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-xs">
-                    <span className="material-symbols-outlined text-xs">link</span>
+                  <div className="w-6 h-6 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-xs font-bold text-xs">
+                    🔗
                   </div>
                   <div className="text-left">
                     <p className="font-mono-caps text-[8px] text-[#5e5e5b] tracking-wider uppercase font-bold">
-                      ENVOIE UN MESSAGE ICI
+                      ENVOIE UN MESSAGE ICI (LIEN EN LÉGENDE)
                     </p>
                     <p className="font-display font-extrabold text-xs tracking-tight text-[#0f172a] truncate max-w-[200px]">
                       {window.location.host}/u/{user.username}
@@ -320,41 +320,40 @@ export const InviteStoryModal: React.FC<InviteStoryModalProps> = ({ user, onClos
             <div className="space-y-4">
               <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-2xl flex items-center gap-2 text-xs text-emerald-900 font-semibold">
                 <span className="material-symbols-outlined text-emerald-600 text-xl">check_circle</span>
-                <span>Votre carte 9:16 HD est générée et votre lien est copié !</span>
+                <span>Votre carte 9:16 HD est prête et le lien est copié !</span>
               </div>
 
               {/* Display Generated Photo PNG */}
               <div className="relative group flex flex-col items-center">
                 <img
                   src={generatedImageDataUrl}
-                  alt="Carte Statut NGL"
+                  alt="Carte Statut TCHAT"
                   className="w-full max-w-[260px] aspect-[9/16] rounded-2xl shadow-2xl object-contain mx-auto border border-slate-200 bg-black/5"
                 />
                 <p className="text-[10px] text-[#5e5e5b] font-mono-caps uppercase mt-2 text-center">
-                  💡 Astuce : Appuyez longuement sur l'image ci-dessus pour l'enregistrer dans vos photos
+                  💡 Astuce : Téléchargez l'image ou appuyez dessus pour l'enregistrer dans vos photos
                 </p>
               </div>
 
-              {/* Instructions for WhatsApp Status */}
+              {/* Instructions & Explanation for Status Links */}
               <div className="bg-slate-900 text-white p-4 rounded-2xl space-y-3">
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[#25D366] text-xl">camera</span>
+                  <span className="material-symbols-outlined text-[#25D366] text-xl">chat</span>
                   <h4 className="font-display font-bold text-xs uppercase tracking-wider text-white">
-                    3 Étapes pour publier sur WhatsApp Statut :
+                    Pourquoi et comment rendre le lien cliquable ?
                   </h4>
                 </div>
-                <div className="space-y-2 text-xs font-body text-slate-300">
+                <div className="space-y-2.5 text-xs font-body text-slate-300">
+                  <p className="text-[11px] leading-relaxed text-slate-300 bg-slate-800 p-2.5 rounded-xl border border-slate-700">
+                    ℹ️ <strong>Remarque :</strong> Sur WhatsApp et Instagram, les photos publiées en statut ne contiennent jamais de liens cliquables directement sur l'image (ce sont des fichiers images PNG). Pour que vos contacts puissent cliquer :
+                  </p>
                   <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-[#25D366] text-slate-950 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">1</span>
-                    <p><strong className="text-white">Téléchargez l'image</strong> ci-dessus dans la galerie de votre téléphone.</p>
+                    <p><strong className="text-white">Option WhatsApp Statut Texte (Lien 100% Cliquable) :</strong> Cliquez sur le bouton vert ci-dessous <em>"Partager avec lien cliquable sur WhatsApp"</em>.</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-[#25D366] text-slate-950 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">2</span>
-                    <p><strong className="text-white">Copiez le lien de votre profil :</strong> <span className="text-pink-300 font-mono text-[11px] underline break-all">{publicUrl}</span></p>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="w-5 h-5 rounded-full bg-[#25D366] text-slate-950 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">3</span>
-                    <p>Ouvrez <strong className="text-white">WhatsApp &gt; Statut</strong>, touchez l'icône <strong className="text-white">Appareil Photo</strong>, sélectionnez cette image et collez votre lien en légende !</p>
+                    <p><strong className="text-white">Option Photo Statut / Instagram :</strong> Téléchargez l'image, puis collez votre lien secret <span className="text-pink-300 font-mono text-[11px] underline break-all">{publicUrl}</span> en légende ou avec le Sticker Lien !</p>
                   </div>
                 </div>
               </div>
@@ -362,26 +361,37 @@ export const InviteStoryModal: React.FC<InviteStoryModalProps> = ({ user, onClos
               {/* Action Buttons */}
               <div className="space-y-2">
                 <button
+                  onClick={() => {
+                    const text = encodeURIComponent(`💬 Pose-moi une question ou dis-moi ce que tu penses de moi 100% anonymement 🤫 :\n${publicUrl}`);
+                    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+                  }}
+                  className="w-full bg-[#25D366] text-slate-950 py-3.5 rounded-2xl font-display font-extrabold text-xs flex items-center justify-center gap-2 hover:bg-[#20bd5a] active:scale-98 transition-all shadow-md text-center"
+                >
+                  <span className="material-symbols-outlined text-xl">share</span>
+                  <span>📲 PARTAGER LE LIEN CLIQUABLE SUR WHATSAPP</span>
+                </button>
+
+                <button
                   onClick={() => downloadImageDataUrl(generatedImageDataUrl, `tchat-status-${user.username}-${Date.now()}.png`)}
-                  className="w-full bg-[#25D366] text-slate-950 py-3.5 rounded-2xl font-display font-bold text-xs flex items-center justify-center gap-2 hover:bg-[#20bd5a] active:scale-98 transition-all shadow-md text-center"
+                  className="w-full bg-white text-slate-900 border-2 border-slate-900 py-3 rounded-2xl font-display font-bold text-xs flex items-center justify-center gap-2 hover:bg-slate-100 transition-colors"
                 >
                   <span className="material-symbols-outlined text-lg">download</span>
-                  <span>TÉLÉCHARGER MON IMAGE STORY (PNG HD)</span>
+                  <span>TÉLÉCHARGER L'IMAGE STORY (PNG HD)</span>
                 </button>
 
                 <button
                   onClick={handleCopyLink}
-                  className="w-full bg-slate-800 text-white py-3 rounded-2xl font-display font-bold text-xs flex items-center justify-center gap-2 hover:bg-slate-700 transition-colors"
+                  className="w-full bg-slate-800 text-white py-2.5 rounded-xl font-display font-bold text-xs flex items-center justify-center gap-2 hover:bg-slate-700 transition-colors"
                 >
                   <span className="material-symbols-outlined text-base">content_copy</span>
-                  <span>{copiedLink ? '✓ LIEN COPIÉ DANS LE PRESSE-PAPIER' : 'COPIER LE LIEN SECRET'}</span>
+                  <span>{copiedLink ? '✓ LIEN COPIÉ DANS LE PRESSE-PAPIER' : 'COPIER MON LIEN SECRET'}</span>
                 </button>
 
                 <button
                   onClick={() => setGeneratedImageDataUrl(null)}
-                  className="w-full bg-slate-100 text-slate-700 py-2.5 rounded-xl font-display font-semibold text-xs hover:bg-slate-200 transition-colors"
+                  className="w-full text-slate-500 py-2 font-display font-medium text-xs hover:text-slate-900 transition-colors"
                 >
-                  Modiﬁer la couleur ou la question
+                  Modifier le style ou la question
                 </button>
               </div>
             </div>

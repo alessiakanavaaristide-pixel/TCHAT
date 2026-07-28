@@ -152,19 +152,19 @@ export const InboxView: React.FC<InboxViewProps> = ({
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-pink-400 text-lg">auto_awesome</span>
               <span className="font-mono-caps text-[10px] text-pink-400 font-bold uppercase tracking-wider">
-                COMMENT PARTAGER SUR STATUT WHATSAPP COMME NGL :
+                COMMENT PARTAGER SUR STATUT WHATSAPP :
               </span>
             </div>
             <ol className="space-y-2 text-xs font-body text-slate-300 list-decimal pl-4 leading-relaxed">
-              <li>Cliquez sur <strong className="text-white">Générer ma carte de statut NGL</strong>.</li>
-              <li>Choisissez une question ("Pose-moi une question anonyme...").</li>
-              <li>Cliquez sur <strong className="text-[#25D366]">Générer mon image Story</strong> pour exporter la photo 9:16 HD et copier le lien !</li>
-              <li>Dans WhatsApp ou Instagram, ajoutez l'image à votre Statut/Story et collez le lien.</li>
+              <li>Cliquez sur <strong className="text-white">GÉNÉRER MON IMAGE STORY</strong>.</li>
+              <li>Personnalisez votre question ou ajoutez des stickers.</li>
+              <li>Cliquez sur <strong className="text-[#25D366]">Partager sur WhatsApp</strong> (crée le lien cliquable en statut) ou téléchargez l'image HD !</li>
+              <li>Partagez votre lien secret avec vos amis.</li>
             </ol>
           </div>
         </motion.div>
       ) : (
-        /* TAB 2: INBOX (NGL ENVELOPE MESSAGES) */
+        /* TAB 2: INBOX (MESSAGES REÇUS) */
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
