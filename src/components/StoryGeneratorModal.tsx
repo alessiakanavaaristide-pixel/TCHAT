@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { motion } from 'motion/react';
-import { toPng } from 'html-to-image';
+import { motion, AnimatePresence } from 'motion/react';
 import { Message, UserProfile, ColorTheme } from '../types';
 import { THEMES } from '../lib/constants';
 import { replyToMessage } from '../lib/firebase';
+import { shareCardToStatus } from '../lib/shareUtils';
 
 interface StoryGeneratorModalProps {
   message: Message;
@@ -19,11 +19,12 @@ export const StoryGeneratorModal: React.FC<StoryGeneratorModalProps> = ({
   const [replyText, setReplyText] = useState(message.replyText || "J'ai toujours admiré la façon dont tu traverses les moments les plus calmes.");
   const [storyTheme, setStoryTheme] = useState<ColorTheme>('iridescent');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [savedSuccess, setSavedSuccess] = useState(false);
+  const [showStatusGuide, setShowStatusGuide] = useState(false);
 
   const captureRef = useRef<HTMLDivElement>(null);
   const themeConfig = THEMES[storyTheme] || THEMES.iridescent;
   const userLink = `tchat.app/u/${user.username}`;
+  const publicUrl = `https://${userLink}`;
 
   const handleSaveReply = async () => {
     if (replyText.trim()) {
@@ -31,44 +32,46 @@ export const StoryGeneratorModal: React.FC<StoryGeneratorModalProps> = ({
     }
   };
 
+  const handleShareToWhatsAppStatus = async () => {
+    if (!captureRef.current) return;
+    setIsGenerating(true);
+    await handleSaveReply();
+
+    const result = await shareCardToStatus({
+      element: captureRef.current,
+      filename: `tchat-reply-status-${user.username}-${Date.now()}.png`,
+      title: 'Ma Réponse TCHAT Anonyme',
+      text: `✨ Question : "${message.text}"\n💬 Ma réponse : ${replyText}\n👉 Pose-moi une question ici :`,
+      url: publicUrl,
+    });
+
+    setIsGenerating(false);
+
+    if (result.sharedNatively) {
+      return;
+    }
+
+    setShowStatusGuide(true);
+    setTimeout(() => {
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(`✨ Question : "${message.text}"\n💬 Ma réponse : ${replyText}\n👉 Pose-moi une question ici : ${publicUrl}`)}`, '_blank');
+    }, 800);
+  };
+
   const handleDownloadImage = async () => {
     if (!captureRef.current) return;
     setIsGenerating(true);
     await handleSaveReply();
 
-    try {
-      const dataUrl = await toPng(captureRef.current, { quality: 0.95, cacheBust: true });
-      const link = document.createElement('a');
-      link.download = `tchat-story-${user.username}-${Date.now()}.png`;
-      link.href = dataUrl;
-      link.click();
+    await shareCardToStatus({
+      element: captureRef.current,
+      filename: `tchat-story-${user.username}-${Date.now()}.png`,
+      title: 'Ma Réponse TCHAT Anonyme',
+      text: replyText,
+      url: publicUrl,
+    });
 
-      setSavedSuccess(true);
-      setTimeout(() => setSavedSuccess(false), 2500);
-    } catch (err) {
-      console.error('Failed to generate story image:', err);
-      alert("Échec de la création de l'image. Veuillez réanalyser ou réessayer.");
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const handleShareStory = async () => {
-    await handleDownloadImage();
-    navigator.clipboard.writeText(`https://${userLink}`);
-    alert("Image de story 3D téléchargée ! Le lien de votre profil TCHAT a été copié dans votre presse-papier.");
-  };
-
-  const handleShareWhatsApp = () => {
-    handleSaveReply();
-    const text = encodeURIComponent(`✨ Message Anonyme TCHAT ✨\n\n❓ "${message.text}"\n\n💬 Ma réponse : ${replyText}\n\n👉 Envoie-moi un message secret ici : https://${userLink}`);
-    window.open(`https://wa.me/?text=${text}`, '_blank');
-  };
-
-  const handleShareTwitter = () => {
-    handleSaveReply();
-    const text = encodeURIComponent(`✨ Message Anonyme TCHAT ✨\n\n❓ "${message.text}"\n💬 Ma réponse : ${replyText}\n\nhttps://${userLink}`);
-    window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+    setIsGenerating(false);
+    alert("Image 9:16 enregistrée dans votre galerie !");
   };
 
   return (
@@ -242,37 +245,93 @@ export const StoryGeneratorModal: React.FC<StoryGeneratorModalProps> = ({
             </div>
           </div>
 
-          {/* Action Buttons Grid */}
+          {/* Action Buttons */}
           <div className="space-y-2 pt-1">
             <button
-              onClick={handleShareStory}
+              onClick={handleShareToWhatsAppStatus}
               disabled={isGenerating}
-              className="w-full bg-gradient-to-r from-[#0f172a] via-[#1e293b] to-[#0f172a] text-white py-3.5 rounded-2xl font-body font-semibold text-sm flex items-center justify-center gap-2 hover:opacity-95 active:scale-98 transition-all shadow-lg"
+              className="w-full bg-[#25D366] text-white py-3.5 rounded-2xl font-display font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#20bd5a] active:scale-98 transition-all shadow-lg"
             >
-              <span className="material-symbols-outlined text-lg text-[#60a5fa]">auto_awesome</span>
-              <span>{savedSuccess ? 'Story 3D Enregistrée !' : 'Télécharger l\'Image de Story 3D'}</span>
+              <span className="material-symbols-outlined text-xl">share</span>
+              <span>{isGenerating ? 'Génération de l\'image...' : 'PUBLIER SUR STATUT WHATSAPP'}</span>
             </button>
 
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={handleShareWhatsApp}
-                className="py-3 px-4 rounded-xl border border-[#cbd5e1] font-body text-xs font-semibold text-[#1c1b1b] bg-white flex items-center justify-center gap-1.5 hover:bg-[#f8fafc] active:scale-95 transition-all shadow-xs"
-              >
-                <span className="material-symbols-outlined text-base text-[#22c55e]">chat</span>
-                <span>WhatsApp</span>
-              </button>
-
-              <button
-                onClick={handleDownloadImage}
-                disabled={isGenerating}
-                className="py-3 px-4 rounded-xl border border-[#cbd5e1] font-body text-xs font-semibold text-[#1c1b1b] bg-white flex items-center justify-center gap-1.5 hover:bg-[#f8fafc] active:scale-95 transition-all shadow-xs"
-              >
-                <span className="material-symbols-outlined text-base text-[#2563eb]">download</span>
-                <span>Télécharger</span>
-              </button>
-            </div>
+            <button
+              onClick={handleDownloadImage}
+              disabled={isGenerating}
+              className="w-full bg-slate-100 text-slate-800 border border-slate-300 py-3 rounded-2xl font-display font-semibold text-xs flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors"
+            >
+              <span className="material-symbols-outlined text-base">download</span>
+              <span>Télécharger l'image de la story (9:16 HD)</span>
+            </button>
           </div>
         </div>
+
+        {/* Step-by-Step WhatsApp Status Guide Panel */}
+        <AnimatePresence>
+          {showStatusGuide && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="p-5 bg-slate-900 text-white rounded-t-3xl space-y-4 border-t-2 border-[#25D366]"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-2xl text-[#25D366]">check_circle</span>
+                  <h3 className="font-display font-bold text-sm text-white">
+                    Image prêt pour Statut WhatsApp !
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setShowStatusGuide(false)}
+                  className="text-slate-400 hover:text-white"
+                >
+                  <span className="material-symbols-outlined text-lg">close</span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 gap-2 text-xs font-body text-slate-300 bg-slate-800/80 p-3.5 rounded-2xl border border-slate-700">
+                <div className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#25D366] text-slate-950 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                    1
+                  </span>
+                  <p>
+                    <strong className="text-white">Image 9:16 enregistrée</strong> dans votre galerie photo.
+                  </p>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#25D366] text-slate-950 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                    2
+                  </span>
+                  <p>
+                    <strong className="text-white">Lien copié :</strong> {publicUrl}
+                  </p>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#25D366] text-slate-950 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                    3
+                  </span>
+                  <p>
+                    Dans WhatsApp, touchez <strong className="text-white">Statut</strong> -&gt; Sélectionnez l'image téléchargée -&gt; Collez votre lien.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  setShowStatusGuide(false);
+                  onClose();
+                }}
+                className="w-full bg-[#25D366] text-slate-950 font-display font-bold text-xs py-3 rounded-xl hover:bg-[#20bd5a] transition-colors"
+              >
+                C'est compris, fermer
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </div>
   );

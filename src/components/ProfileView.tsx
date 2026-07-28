@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { UserProfile, ColorTheme } from '../types';
 import { THEMES } from '../lib/constants';
 import { checkUsernameAvailable, saveUserProfile } from '../lib/firebase';
+import { InviteStoryModal } from './InviteStoryModal';
 
 interface ProfileViewProps {
   user: UserProfile;
@@ -24,6 +25,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
 
   const publicUrl = `${window.location.origin}/u/${user.username}`;
 
@@ -133,12 +135,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </button>
 
             <button
-              onClick={handleShareWhatsApp}
+              onClick={() => setShowInviteModal(true)}
               type="button"
               className="px-3 py-1.5 rounded-lg bg-[#25D366] text-white font-mono-caps text-xs font-bold hover:bg-[#20bd5a] transition-colors flex-1 sm:flex-none flex items-center justify-center gap-1 shadow-sm"
             >
-              <span className="material-symbols-outlined text-sm">share</span>
-              WhatsApp
+              <span className="material-symbols-outlined text-sm">photo_camera</span>
+              Statut WhatsApp
             </button>
           </div>
         </div>
@@ -275,6 +277,14 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           </button>
         </div>
       </form>
+
+      {/* Invite Story Modal (NGL Status Generator) */}
+      {showInviteModal && (
+        <InviteStoryModal
+          user={user}
+          onClose={() => setShowInviteModal(false)}
+        />
+      )}
     </div>
   );
 };

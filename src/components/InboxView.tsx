@@ -6,6 +6,7 @@ import {
   deleteMessage, 
   reportMessage 
 } from '../lib/firebase';
+import { InviteStoryModal } from './InviteStoryModal';
 
 interface InboxViewProps {
   user: UserProfile;
@@ -22,6 +23,7 @@ export const InboxView: React.FC<InboxViewProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'play' | 'inbox'>('play');
   const [copiedLink, setCopiedLink] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
 
   const publicLink = `${window.location.origin}/u/${user.username}`;
 
@@ -121,43 +123,48 @@ export const InboxView: React.FC<InboxViewProps> = ({
             </div>
           </div>
 
-          {/* Step 1 & Step 2 Buttons */}
+          {/* Main Action Buttons */}
           <div className="space-y-3">
             <button
-              onClick={handleCopyLink}
-              className="w-full bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 text-white font-display font-bold text-base py-4 rounded-2xl shadow-lg hover:opacity-95 active:scale-98 transition-all flex items-center justify-center gap-2"
+              onClick={() => setShowInviteModal(true)}
+              className="w-full bg-gradient-to-r from-emerald-500 via-teal-500 to-green-600 text-white font-display font-bold text-base py-4 rounded-2xl shadow-lg hover:opacity-95 active:scale-98 transition-all flex items-center justify-center gap-2 ring-2 ring-emerald-300/50"
             >
-              <span className="material-symbols-outlined text-xl">content_copy</span>
-              <span>1. COPIER LE LIEN</span>
+              <span className="material-symbols-outlined text-2xl">photo_camera</span>
+              <span>GÉNÉRER MA CARTE DE STATUT NGL</span>
             </button>
 
-            <button
-              onClick={handleShareWhatsApp}
-              className="w-full bg-emerald-500 text-white font-display font-bold text-base py-4 rounded-2xl shadow-md hover:bg-emerald-600 active:scale-98 transition-all flex items-center justify-center gap-2"
-            >
-              <span className="material-symbols-outlined text-xl">share</span>
-              <span>2. PARTAGER SUR WHATSAPP / INSTA</span>
-            </button>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={handleCopyLink}
+                className="bg-slate-900 text-white font-display font-bold text-xs py-3.5 rounded-2xl shadow-md hover:bg-slate-800 transition-all flex items-center justify-center gap-1.5"
+              >
+                <span className="material-symbols-outlined text-base">content_copy</span>
+                <span>{copiedLink ? 'Lien Copié !' : 'Copier le lien'}</span>
+              </button>
 
-            <button
-              onClick={() => onNavigate(`/u/${user.username}`)}
-              className="w-full bg-slate-100 text-slate-800 border border-slate-300 font-display font-bold text-xs py-3 rounded-2xl hover:bg-slate-200 transition-colors flex items-center justify-center gap-1.5"
-            >
-              <span className="material-symbols-outlined text-base">visibility</span>
-              <span>Aperçu de ce que voient vos amis</span>
-            </button>
+              <button
+                onClick={() => onNavigate(`/u/${user.username}`)}
+                className="bg-slate-100 text-slate-800 border border-slate-300 font-display font-bold text-xs py-3.5 rounded-2xl hover:bg-slate-200 transition-colors flex items-center justify-center gap-1.5"
+              >
+                <span className="material-symbols-outlined text-base">visibility</span>
+                <span>Voir mon profil</span>
+              </button>
+            </div>
           </div>
 
-          {/* How to Share on Story Box */}
+          {/* How to Share on Status Box */}
           <div className="bg-slate-900 text-white p-5 rounded-3xl shadow-lg space-y-3">
-            <span className="font-mono-caps text-[10px] text-pink-400 font-bold uppercase tracking-wider block">
-              💡 COMMENT PARTAGER SUR VOTRE STORY :
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-pink-400 text-lg">auto_awesome</span>
+              <span className="font-mono-caps text-[10px] text-pink-400 font-bold uppercase tracking-wider">
+                COMMENT PARTAGER SUR STATUT WHATSAPP COMME NGL :
+              </span>
+            </div>
             <ol className="space-y-2 text-xs font-body text-slate-300 list-decimal pl-4 leading-relaxed">
-              <li>Cliquez sur <strong>Copier le lien</strong> ci-dessus.</li>
-              <li>Ouvrez <strong>Instagram</strong> et créez une nouvelle Story.</li>
-              <li>Appuyez sur l'icône <strong>Stickers</strong> et choisissez <strong>Lien</strong>.</li>
-              <li>Collez votre lien TCHAT et publiez !</li>
+              <li>Cliquez sur <strong className="text-white">Générer ma carte de statut NGL</strong>.</li>
+              <li>Choisissez une question ("Pose-moi une question anonyme...").</li>
+              <li>Cliquez sur <strong className="text-[#25D366]">Publier sur Statut WhatsApp</strong> pour exporter l'image 9:16 stylisée et copier votre lien !</li>
+              <li>Dans WhatsApp, ajoutez l'image à votre Statut et collez le lien.</li>
             </ol>
           </div>
         </motion.div>
@@ -234,6 +241,14 @@ export const InboxView: React.FC<InboxViewProps> = ({
             </div>
           )}
         </motion.div>
+      )}
+
+      {/* Invite Story Modal (NGL Status Generator) */}
+      {showInviteModal && (
+        <InviteStoryModal
+          user={user}
+          onClose={() => setShowInviteModal(false)}
+        />
       )}
     </div>
   );
