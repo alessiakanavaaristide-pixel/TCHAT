@@ -120,17 +120,23 @@ export const PublicSendView: React.FC<PublicSendViewProps> = ({
                 "{promptQuestion}"
               </h2>
 
-              <textarea
-                value={messageText}
-                onChange={(e) => {
-                  setMessageText(e.target.value);
-                  if (errorMessage) setErrorMessage(null);
-                }}
-                maxLength={300}
-                placeholder="écris ton message secret ici..."
-                className="w-full min-h-[120px] bg-black/20 rounded-2xl p-3 font-body text-sm text-white placeholder:text-white/60 resize-none outline-none focus:ring-2 focus:ring-white/40 transition-all border border-white/20"
-                required
-              />
+              <div>
+                <label htmlFor="anonymous-input" className="block text-[11px] font-mono-caps font-extrabold tracking-wider text-white/90 mb-1.5 uppercase">
+                  💬 Écris ta réponse / ton message ci-dessous :
+                </label>
+                <textarea
+                  id="anonymous-input"
+                  value={messageText}
+                  onChange={(e) => {
+                    setMessageText(e.target.value);
+                    if (errorMessage) setErrorMessage(null);
+                  }}
+                  maxLength={300}
+                  placeholder="Tape ton message secret ici..."
+                  className="w-full min-h-[120px] bg-black/30 rounded-2xl p-3 font-body text-sm text-white placeholder:text-white/60 resize-none outline-none focus:ring-2 focus:ring-white/80 transition-all border border-white/30 shadow-inner"
+                  required
+                />
+              </div>
 
               <div className="flex justify-between items-center text-[10px] font-mono-caps text-white/70">
                 <span>100% Anonyme</span>
