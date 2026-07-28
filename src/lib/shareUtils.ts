@@ -1,5 +1,4 @@
 import { toPng } from 'html-to-image';
-import html2canvas from 'html2canvas';
 
 export interface ShareOptions {
   element: HTMLDivElement;
@@ -16,50 +15,43 @@ export interface ShareResult {
   dataUrl: string;
 }
 
+/**
+ * Single clean capture pipeline using html-to-image to avoid multi-library CORS conflicts.
+ */
 export async function generateImagePng(element: HTMLElement): Promise<string> {
-  // Method 1: Try html2canvas (Most reliable across mobile browsers and CORS)
-  try {
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: null,
-      logging: false,
-      ignoreElements: (node) => node.classList?.contains('no-capture'),
-    });
-    const dataUrl = canvas.toDataURL('image/png', 0.98);
-    if (dataUrl && dataUrl.length > 100) {
-      return dataUrl;
-    }
-  } catch (err) {
-    console.warn('html2canvas capture failed, trying html-to-image:', err);
+  if (!element) {
+    throw new Error("L'élément de prévisualisation est introuvable.");
   }
 
-  // Method 2: Try html-to-image as fallback
   try {
     const dataUrl = await toPng(element, {
       quality: 0.98,
       pixelRatio: 2,
       skipFonts: true,
       cacheBust: true,
+      filter: (node) => {
+        // Exclude elements with class 'no-capture'
+        return !node.classList?.contains('no-capture');
+      },
     });
-    if (dataUrl && dataUrl.length > 100) {
-      return dataUrl;
-    }
-  } catch (err2) {
-    console.warn('High-res html-to-image failed, trying simple html-to-image:', err2);
-  }
 
-  // Method 3: Low-res html-to-image retry
-  try {
-    return await toPng(element, {
-      quality: 0.85,
-      pixelRatio: 1,
-      skipFonts: true,
-    });
-  } catch (err3) {
-    console.error('All image capture methods failed:', err3);
-    return '';
+    if (!dataUrl || dataUrl.length < 100) {
+      throw new Error("Erreur lors de la création du fichier image.");
+    }
+    return dataUrl;
+  } catch (err) {
+    console.warn('html-to-image high-res capture failed, trying standard resolution:', err);
+    try {
+      return await toPng(element, {
+        quality: 0.9,
+        pixelRatio: 1,
+        skipFonts: true,
+        filter: (node) => !node.classList?.contains('no-capture'),
+      });
+    } catch (fallbackErr) {
+      console.error('Final image generation error:', fallbackErr);
+      throw new Error("Impossible de générer l'image. Veuillez réessayer.");
+    }
   }
 }
 
@@ -67,7 +59,6 @@ export function downloadImageDataUrl(dataUrl: string, filename: string) {
   if (!dataUrl) return;
 
   try {
-    // Convert base64 dataUrl to Blob for max browser & mobile compatibility
     const arr = dataUrl.split(',');
     if (arr.length < 2) {
       throw new Error('Invalid dataUrl format');
@@ -90,7 +81,6 @@ export function downloadImageDataUrl(dataUrl: string, filename: string) {
     link.click();
     document.body.removeChild(link);
 
-    // Clean up object URL after a short delay
     setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
   } catch (err) {
     console.warn('Blob download failed, falling back to direct anchor download:', err);
@@ -106,7 +96,7 @@ export function downloadImageDataUrl(dataUrl: string, filename: string) {
 export async function shareCardToStatus(options: ShareOptions): Promise<ShareResult> {
   const { element, filename, title, text, url } = options;
 
-  let dataUrl = await generateImagePng(element);
+  const dataUrl = await generateImagePng(element);
   let blob: Blob | null = null;
 
   if (dataUrl) {
@@ -118,7 +108,7 @@ export async function shareCardToStatus(options: ShareOptions): Promise<ShareRes
     }
   }
 
-  // Always copy link to clipboard
+  // Always copy profile link to clipboard
   let copiedLink = false;
   try {
     await navigator.clipboard.writeText(url);
@@ -127,7 +117,7 @@ export async function shareCardToStatus(options: ShareOptions): Promise<ShareRes
     console.warn('Could not copy link to clipboard:', e);
   }
 
-  // Try Web Share API with image file if supported
+  // Try Web Share API with image file if supported (iOS / Android Instagram Story flow)
   if (blob && navigator.canShare && navigator.share) {
     const file = new File([blob], filename, { type: 'image/png' });
     if (navigator.canShare({ files: [file] })) {
@@ -146,11 +136,10 @@ export async function shareCardToStatus(options: ShareOptions): Promise<ShareRes
     }
   }
 
-  // Fallback: Trigger browser download link using blob URL
+  // Direct download PNG fallback for desktop or web browsers without file share
   if (dataUrl) {
     downloadImageDataUrl(dataUrl, filename);
   }
 
   return { sharedNatively: false, downloaded: !!dataUrl, copiedLink, dataUrl };
 }
-

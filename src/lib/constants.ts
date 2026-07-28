@@ -32,10 +32,10 @@ export const THEMES: Record<ColorTheme, ThemeConfig> = {
     id: 'cyber3d',
     name: '3D Néon Sombre',
     bg: '#0a0d14',
-    cardBg: 'rgba(15, 23, 42, 0.92)',
+    cardBg: 'rgba(15, 23, 42, 0.95)',
     cardBorder: 'rgba(99, 102, 241, 0.5)',
     textPrimary: '#ffffff',
-    textSecondary: '#94a3b8',
+    textSecondary: '#cbd5e1',
     accent: '#818cf8',
     previewColor: '#1e1b4b',
     glass: true
@@ -46,7 +46,7 @@ export const THEMES: Record<ColorTheme, ThemeConfig> = {
     bg: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
     cardBg: '#ffffff',
     cardBorder: 'rgba(251, 146, 60, 0.3)',
-    textPrimary: '#431407',
+    textPrimary: '#3b1207',
     textSecondary: '#7c2d12',
     accent: '#ea580c',
     previewColor: '#fcb69f'
@@ -58,7 +58,7 @@ export const THEMES: Record<ColorTheme, ThemeConfig> = {
     cardBg: '#ffffff',
     cardBorder: '#ebe1d4',
     textPrimary: '#1c1b1b',
-    textSecondary: '#5e5e5b',
+    textSecondary: '#4a4a47',
     accent: '#000000',
     previewColor: '#fdf8f8'
   },
@@ -66,10 +66,10 @@ export const THEMES: Record<ColorTheme, ThemeConfig> = {
     id: 'sand',
     name: 'Sable Chaud',
     bg: '#f5e6da',
-    cardBg: '#fdf8f8',
+    cardBg: '#ffffff',
     cardBorder: '#e4d3c3',
     textPrimary: '#29231d',
-    textSecondary: '#6e6258',
+    textSecondary: '#574d44',
     accent: '#29231d',
     previewColor: '#f5e6da'
   },
@@ -90,8 +90,8 @@ export const THEMES: Record<ColorTheme, ThemeConfig> = {
     bg: '#18181b',
     cardBg: '#27272a',
     cardBorder: '#3f3f46',
-    textPrimary: '#f4f4f5',
-    textSecondary: '#a1a1aa',
+    textPrimary: '#ffffff',
+    textSecondary: '#cbd5e1',
     accent: '#ffffff',
     previewColor: '#18181b'
   },
@@ -99,11 +99,45 @@ export const THEMES: Record<ColorTheme, ThemeConfig> = {
     id: 'rose',
     name: 'Rose Poudré',
     bg: '#fce7f3',
-    cardBg: '#fff1f2',
+    cardBg: '#ffffff',
     cardBorder: '#fbcfe8',
-    textPrimary: '#4c1d95',
+    textPrimary: '#3b0764',
     textSecondary: '#701a75',
-    accent: '#4c1d95',
+    accent: '#3b0764',
     previewColor: '#fce7f3'
   }
 };
+
+/**
+ * Standardizes date formatting across Firestore Timestamps, ISO strings, and raw numbers.
+ */
+export function formatMessageDate(createdAt: any): string {
+  if (!createdAt) return 'À l\'instant';
+
+  let dateObj: Date;
+
+  if (typeof createdAt === 'object' && typeof createdAt.toDate === 'function') {
+    dateObj = createdAt.toDate();
+  } else if (typeof createdAt === 'string' || typeof createdAt === 'number') {
+    dateObj = new Date(createdAt);
+  } else {
+    return 'Récemment';
+  }
+
+  if (isNaN(dateObj.getTime())) return 'Récemment';
+
+  const diffMs = Date.now() - dateObj.getTime();
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+
+  if (diffMinutes < 2) return 'À l\'instant';
+  if (diffMinutes < 60) return `Il y a ${diffMinutes} min`;
+  if (diffHours < 24) return `Il y a ${diffHours}h`;
+
+  return dateObj.toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}

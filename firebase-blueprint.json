@@ -2,18 +2,36 @@
   "entities": {
     "User": {
       "title": "User",
-      "description": "User profile and settings",
+      "description": "Public user profile and settings",
       "type": "object",
       "properties": {
         "username": { "type": "string" },
         "name": { "type": "string" },
-        "email": { "type": "string" },
         "image": { "type": "string" },
         "bio": { "type": "string" },
         "theme": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["username", "createdAt"]
+    },
+    "UserPrivateInfo": {
+      "title": "UserPrivateInfo",
+      "description": "Private sensitive user info such as email",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "UsernameIndex": {
+      "title": "UsernameIndex",
+      "description": "Index mapping clean username to user UID",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid"]
     },
     "Message": {
       "title": "Message",
@@ -22,14 +40,49 @@
       "properties": {
         "recipientId": { "type": "string" },
         "recipientUsername": { "type": "string" },
-        "text": { "type": "string" },
+        "text": { "type": "string", "maxLength": 500 },
+        "promptQuestion": { "type": "string" },
         "isRead": { "type": "boolean" },
         "isFavorite": { "type": "boolean" },
         "isFlagged": { "type": "boolean" },
         "createdAt": { "type": "string", "format": "date-time" },
         "replyText": { "type": "string" }
       },
-      "required": ["recipientId", "text", "createdAt"]
+      "required": ["recipientId", "text"]
+    },
+    "Report": {
+      "title": "Report",
+      "description": "Abuse or harassment report",
+      "type": "object",
+      "properties": {
+        "messageId": { "type": "string" },
+        "recipientId": { "type": "string" },
+        "reason": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["messageId", "recipientId", "reason"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Public profile collection"
+    },
+    "/users/{userId}/private/{docId}": {
+      "schema": "UserPrivateInfo",
+      "description": "Strictly private PII collection for user"
+    },
+    "/usernames/{username}": {
+      "schema": "UsernameIndex",
+      "description": "Username availability mapping"
+    },
+    "/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Anonymous messages"
+    },
+    "/reports/{reportId}": {
+      "schema": "Report",
+      "description": "Reports collection"
     }
   }
 }

@@ -3,9 +3,9 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Message, UserProfile } from '../types';
 import { 
   markMessageRead, 
-  deleteMessage, 
-  reportMessage 
+  deleteMessage 
 } from '../lib/firebase';
+import { formatMessageDate } from '../lib/constants';
 import { InviteStoryModal } from './InviteStoryModal';
 
 interface InboxViewProps {
@@ -31,11 +31,6 @@ export const InboxView: React.FC<InboxViewProps> = ({
     navigator.clipboard.writeText(publicLink);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
-  };
-
-  const handleShareWhatsApp = () => {
-    const text = encodeURIComponent(`✨ Pose-moi n'importe quelle question anonymement 🤫 :\n${publicLink}`);
-    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
 
   const handleMessageClick = (msg: Message) => {
@@ -163,8 +158,8 @@ export const InboxView: React.FC<InboxViewProps> = ({
             <ol className="space-y-2 text-xs font-body text-slate-300 list-decimal pl-4 leading-relaxed">
               <li>Cliquez sur <strong className="text-white">Générer ma carte de statut NGL</strong>.</li>
               <li>Choisissez une question ("Pose-moi une question anonyme...").</li>
-              <li>Cliquez sur <strong className="text-[#25D366]">Publier sur Statut WhatsApp</strong> pour exporter l'image 9:16 stylisée et copier votre lien !</li>
-              <li>Dans WhatsApp, ajoutez l'image à votre Statut et collez le lien.</li>
+              <li>Cliquez sur <strong className="text-[#25D366]">Générer mon image Story</strong> pour exporter la photo 9:16 HD et copier le lien !</li>
+              <li>Dans WhatsApp ou Instagram, ajoutez l'image à votre Statut/Story et collez le lien.</li>
             </ol>
           </div>
         </motion.div>
@@ -206,11 +201,11 @@ export const InboxView: React.FC<InboxViewProps> = ({
                       "{msg.text}"
                     </p>
 
-                    <div className="w-full pt-2 border-t border-white/20 flex items-center justify-between text-[10px] font-mono-caps">
-                      <span>RÉPONDRE</span>
+                    <div className="w-full pt-2 border-t border-white/20 flex items-center justify-between text-[9px] font-mono-caps">
+                      <span className="opacity-80">{formatMessageDate(msg.createdAt)}</span>
                       <button 
                         onClick={(e) => handleDelete(e, msg.id)}
-                        className="text-white/70 hover:text-white"
+                        className="text-white/80 hover:text-white"
                         title="Supprimer"
                       >
                         <span className="material-symbols-outlined text-sm">delete</span>
