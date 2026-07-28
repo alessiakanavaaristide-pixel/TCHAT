@@ -250,8 +250,8 @@ export const InviteStoryModal: React.FC<InviteStoryModalProps> = ({ user, onClos
                     <p className="font-mono-caps text-[8px] text-[#5e5e5b] tracking-wider uppercase font-bold">
                       ENVOIE UN MESSAGE ICI
                     </p>
-                    <p className="font-display font-extrabold text-xs tracking-tight text-[#0f172a]">
-                      tchat.app/u/{user.username}
+                    <p className="font-display font-extrabold text-xs tracking-tight text-[#0f172a] truncate max-w-[200px]">
+                      {window.location.host}/u/{user.username}
                     </p>
                   </div>
                 </div>
