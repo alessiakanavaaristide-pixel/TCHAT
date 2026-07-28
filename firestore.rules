@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users collection
+    match /users/{userId} {
+      allow read, write: if true;
+    }
+
+    // Username mapping index for fast lookups & uniqueness
+    match /usernames/{username} {
+      allow read, write: if true;
+    }
+
+    // Messages collection
+    match /messages/{messageId} {
+      allow read, write: if true;
+    }
+
+    // Reports collection
+    match /reports/{reportId} {
+      allow read, write: if true;
+    }
+  }
+}

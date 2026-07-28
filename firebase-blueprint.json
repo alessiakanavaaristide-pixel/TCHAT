@@ -1,0 +1,35 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and settings",
+      "type": "object",
+      "properties": {
+        "username": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "image": { "type": "string" },
+        "bio": { "type": "string" },
+        "theme": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["username", "createdAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Anonymous message sent to a user",
+      "type": "object",
+      "properties": {
+        "recipientId": { "type": "string" },
+        "recipientUsername": { "type": "string" },
+        "text": { "type": "string" },
+        "isRead": { "type": "boolean" },
+        "isFavorite": { "type": "boolean" },
+        "isFlagged": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "replyText": { "type": "string" }
+      },
+      "required": ["recipientId", "text", "createdAt"]
+    }
+  }
+}
