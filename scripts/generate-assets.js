@@ -57,9 +57,13 @@ async function main() {
     .toFile(path.join(publicDir, 'apple-touch-icon.png'));
 
   await sharp(Buffer.from(logoSvg))
-    .resize(64, 64)
+    .resize(32, 32)
     .png()
     .toFile(path.join(publicDir, 'favicon.png'));
+
+  await sharp(Buffer.from(logoSvg))
+    .resize(32, 32)
+    .toFile(path.join(publicDir, 'favicon.ico'));
 
   console.log('Successfully generated og-image.png, logo.png, favicon.png, apple-touch-icon.png');
 }

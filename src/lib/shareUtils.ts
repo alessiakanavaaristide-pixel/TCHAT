@@ -1,4 +1,5 @@
 import { toPng } from 'html-to-image';
+import html2canvas from 'html2canvas';
 
 export interface ShareOptions {
   element: HTMLDivElement;
@@ -16,28 +17,89 @@ export interface ShareResult {
 }
 
 export async function generateImagePng(element: HTMLElement): Promise<string> {
-  // Try high quality capture with skipFonts to avoid CORS crashes
+  // Method 1: Try html2canvas (Most reliable across mobile browsers and CORS)
   try {
-    return await toPng(element, {
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: null,
+      logging: false,
+      ignoreElements: (node) => node.classList?.contains('no-capture'),
+    });
+    const dataUrl = canvas.toDataURL('image/png', 0.98);
+    if (dataUrl && dataUrl.length > 100) {
+      return dataUrl;
+    }
+  } catch (err) {
+    console.warn('html2canvas capture failed, trying html-to-image:', err);
+  }
+
+  // Method 2: Try html-to-image as fallback
+  try {
+    const dataUrl = await toPng(element, {
       quality: 0.98,
       pixelRatio: 2,
       skipFonts: true,
       cacheBust: true,
     });
-  } catch (err) {
-    console.warn('High-res PNG capture failed, retrying simple capture:', err);
+    if (dataUrl && dataUrl.length > 100) {
+      return dataUrl;
+    }
+  } catch (err2) {
+    console.warn('High-res html-to-image failed, trying simple html-to-image:', err2);
   }
 
-  // Fallback capture
+  // Method 3: Low-res html-to-image retry
   try {
     return await toPng(element, {
-      quality: 0.9,
-      pixelRatio: 1.5,
+      quality: 0.85,
+      pixelRatio: 1,
       skipFonts: true,
     });
-  } catch (err2) {
-    console.error('All PNG capture attempts failed:', err2);
+  } catch (err3) {
+    console.error('All image capture methods failed:', err3);
     return '';
+  }
+}
+
+export function downloadImageDataUrl(dataUrl: string, filename: string) {
+  if (!dataUrl) return;
+
+  try {
+    // Convert base64 dataUrl to Blob for max browser & mobile compatibility
+    const arr = dataUrl.split(',');
+    if (arr.length < 2) {
+      throw new Error('Invalid dataUrl format');
+    }
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    const mime = mimeMatch ? mimeMatch[1] : 'image/png';
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    const blob = new Blob([u8arr], { type: mime });
+    const blobUrl = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Clean up object URL after a short delay
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+  } catch (err) {
+    console.warn('Blob download failed, falling back to direct anchor download:', err);
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 }
 
@@ -84,19 +146,11 @@ export async function shareCardToStatus(options: ShareOptions): Promise<ShareRes
     }
   }
 
-  // Fallback: Trigger browser download link
+  // Fallback: Trigger browser download link using blob URL
   if (dataUrl) {
-    try {
-      const link = document.createElement('a');
-      link.download = filename;
-      link.href = dataUrl;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (dlErr) {
-      console.warn('Download link click failed:', dlErr);
-    }
+    downloadImageDataUrl(dataUrl, filename);
   }
 
   return { sharedNatively: false, downloaded: !!dataUrl, copiedLink, dataUrl };
 }
+

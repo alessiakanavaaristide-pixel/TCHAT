@@ -2,7 +2,10 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { UserProfile, ColorTheme } from '../types';
 import { THEMES } from '../lib/constants';
-import { shareCardToStatus } from '../lib/shareUtils';
+import { shareCardToStatus, downloadImageDataUrl } from '../lib/shareUtils';
+import { PresetSticker, PlacedSticker } from '../lib/stickers';
+import { StickerPicker } from './StickerPicker';
+import { StickerOverlay } from './StickerOverlay';
 
 interface InviteStoryModalProps {
   user: UserProfile;
@@ -29,6 +32,46 @@ export const InviteStoryModal: React.FC<InviteStoryModalProps> = ({ user, onClos
 
   const [generatedImageDataUrl, setGeneratedImageDataUrl] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [stickers, setStickers] = useState<PlacedSticker[]>([]);
+
+  const handleAddSticker = (preset: PresetSticker) => {
+    const count = stickers.length;
+    const positions = [
+      { x: 25, y: 18 },
+      { x: 75, y: 18 },
+      { x: 20, y: 82 },
+      { x: 80, y: 82 },
+      { x: 50, y: 14 },
+      { x: 50, y: 85 },
+    ];
+    const pos = positions[count % positions.length];
+    const newSticker: PlacedSticker = {
+      id: `ps-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      content: preset.content,
+      type: preset.type,
+      x: pos.x,
+      y: pos.y,
+      scale: 1,
+      rotation: (count % 2 === 0 ? 1 : -1) * (6 + (count * 5) % 18),
+      bg: preset.bg,
+      textColor: preset.textColor,
+    };
+    setStickers((prev) => [...prev, newSticker]);
+  };
+
+  const handleRemoveSticker = (id: string) => {
+    setStickers((prev) => prev.filter((s) => s.id !== id));
+  };
+
+  const handleClearAllStickers = () => {
+    setStickers([]);
+  };
+
+  const handleUpdateSticker = (id: string, updates: Partial<PlacedSticker>) => {
+    setStickers((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, ...updates } : s))
+    );
+  };
 
   const captureRef = useRef<HTMLDivElement>(null);
   const themeConfig = THEMES[storyTheme] || THEMES.iridescent;
@@ -39,20 +82,28 @@ export const InviteStoryModal: React.FC<InviteStoryModalProps> = ({ user, onClos
     if (!captureRef.current) return;
     setIsProcessing(true);
 
-    const result = await shareCardToStatus({
-      element: captureRef.current,
-      filename: `tchat-status-${user.username}-${Date.now()}.png`,
-      title: 'Mon Statut TCHAT Anonyme',
-      text: `✨ ${displayPrompt}\n👉 Réponds-moi ici 100% anonymement :`,
-      url: publicUrl,
-    });
+    try {
+      const result = await shareCardToStatus({
+        element: captureRef.current,
+        filename: `tchat-status-${user.username}-${Date.now()}.png`,
+        title: 'Mon Statut TCHAT Anonyme',
+        text: `✨ ${displayPrompt}\n👉 Réponds-moi ici 100% anonymement :`,
+        url: publicUrl,
+      });
 
-    setIsProcessing(false);
+      setIsProcessing(false);
 
-    if (result.dataUrl) {
-      setGeneratedImageDataUrl(result.dataUrl);
+      if (result.dataUrl) {
+        setGeneratedImageDataUrl(result.dataUrl);
+        setCopiedLink(true);
+      } else {
+        alert("La génération de l'image a rencontré un souci. Votre lien secret a bien été copié !");
+      }
+    } catch (error) {
+      console.error("Error generating image:", error);
+      setIsProcessing(false);
+      alert("Une erreur est survenue lors de la création de l'image. Veuillez réessayer.");
     }
-    setCopiedLink(true);
   };
 
   const handleCopyLink = () => {
@@ -168,6 +219,20 @@ export const InviteStoryModal: React.FC<InviteStoryModalProps> = ({ user, onClos
             </div>
           </div>
 
+          {/* Sticker Library Customizer */}
+          <div>
+            <label className="font-mono-caps text-xs text-[#5e5e5b] block mb-2 uppercase tracking-wider text-center font-semibold">
+              3. AJOUTER DES STICKERS & EMOJIS (OPTIONNEL)
+            </label>
+            <StickerPicker
+              placedStickers={stickers}
+              onAddSticker={handleAddSticker}
+              onRemoveSticker={handleRemoveSticker}
+              onClearAll={handleClearAllStickers}
+              onUpdateSticker={handleUpdateSticker}
+            />
+          </div>
+
           {/* Live Preview Canvas (9:16 Ratio) */}
           <div className="flex justify-center">
             <div
@@ -183,6 +248,13 @@ export const InviteStoryModal: React.FC<InviteStoryModalProps> = ({ user, onClos
             >
               {/* Subtle Ambient Vignette */}
               <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40 pointer-events-none" />
+
+              {/* Dynamic Placed Stickers Overlay */}
+              <StickerOverlay
+                stickers={stickers}
+                onRemoveSticker={handleRemoveSticker}
+                onUpdateSticker={handleUpdateSticker}
+              />
 
               {/* Header Badge */}
               <div className="relative z-10 flex items-center justify-between">
@@ -289,14 +361,13 @@ export const InviteStoryModal: React.FC<InviteStoryModalProps> = ({ user, onClos
 
               {/* Action Buttons */}
               <div className="space-y-2">
-                <a
-                  href={generatedImageDataUrl}
-                  download={`tchat-status-${user.username}-${Date.now()}.png`}
+                <button
+                  onClick={() => downloadImageDataUrl(generatedImageDataUrl, `tchat-status-${user.username}-${Date.now()}.png`)}
                   className="w-full bg-[#25D366] text-slate-950 py-3.5 rounded-2xl font-display font-bold text-xs flex items-center justify-center gap-2 hover:bg-[#20bd5a] active:scale-98 transition-all shadow-md text-center"
                 >
                   <span className="material-symbols-outlined text-lg">download</span>
-                  <span>TÉLÉCHARGER L'IMAGE PNG (HD)</span>
-                </a>
+                  <span>TÉLÉCHARGER MON IMAGE STORY (PNG HD)</span>
+                </button>
 
                 <button
                   onClick={handleCopyLink}
@@ -324,7 +395,7 @@ export const InviteStoryModal: React.FC<InviteStoryModalProps> = ({ user, onClos
                   className="w-full bg-[#25D366] text-white py-3.5 rounded-2xl font-display font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#20bd5a] active:scale-98 transition-all shadow-lg"
                 >
                   <span className="material-symbols-outlined text-xl">photo_camera</span>
-                  <span>{isProcessing ? 'Génération de l\'image HD...' : 'GÉNÉRER MON IMAGE POUR STATUT WHATSAPP'}</span>
+                  <span>{isProcessing ? 'Génération de l\'image HD...' : 'GÉNÉRER MON IMAGE STORY (STATUT / INSTA)'}</span>
                 </button>
               </div>
             </>

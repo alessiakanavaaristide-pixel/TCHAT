@@ -3,7 +3,10 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Message, UserProfile, ColorTheme } from '../types';
 import { THEMES } from '../lib/constants';
 import { replyToMessage } from '../lib/firebase';
-import { shareCardToStatus } from '../lib/shareUtils';
+import { shareCardToStatus, downloadImageDataUrl } from '../lib/shareUtils';
+import { PresetSticker, PlacedSticker } from '../lib/stickers';
+import { StickerPicker } from './StickerPicker';
+import { StickerOverlay } from './StickerOverlay';
 
 interface StoryGeneratorModalProps {
   message: Message;
@@ -23,6 +26,46 @@ export const StoryGeneratorModal: React.FC<StoryGeneratorModalProps> = ({
 
   const [generatedImageDataUrl, setGeneratedImageDataUrl] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [stickers, setStickers] = useState<PlacedSticker[]>([]);
+
+  const handleAddSticker = (preset: PresetSticker) => {
+    const count = stickers.length;
+    const positions = [
+      { x: 25, y: 15 },
+      { x: 75, y: 15 },
+      { x: 20, y: 82 },
+      { x: 80, y: 82 },
+      { x: 50, y: 12 },
+      { x: 50, y: 85 },
+    ];
+    const pos = positions[count % positions.length];
+    const newSticker: PlacedSticker = {
+      id: `ps-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      content: preset.content,
+      type: preset.type,
+      x: pos.x,
+      y: pos.y,
+      scale: 1,
+      rotation: (count % 2 === 0 ? 1 : -1) * (6 + (count * 5) % 18),
+      bg: preset.bg,
+      textColor: preset.textColor,
+    };
+    setStickers((prev) => [...prev, newSticker]);
+  };
+
+  const handleRemoveSticker = (id: string) => {
+    setStickers((prev) => prev.filter((s) => s.id !== id));
+  };
+
+  const handleClearAllStickers = () => {
+    setStickers([]);
+  };
+
+  const handleUpdateSticker = (id: string, updates: Partial<PlacedSticker>) => {
+    setStickers((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, ...updates } : s))
+    );
+  };
 
   const captureRef = useRef<HTMLDivElement>(null);
   const themeConfig = THEMES[storyTheme] || THEMES.iridescent;
@@ -40,20 +83,28 @@ export const StoryGeneratorModal: React.FC<StoryGeneratorModalProps> = ({
     setIsGenerating(true);
     await handleSaveReply();
 
-    const result = await shareCardToStatus({
-      element: captureRef.current,
-      filename: `tchat-reply-${user.username}-${Date.now()}.png`,
-      title: 'Ma Réponse TCHAT Anonyme',
-      text: `✨ Question : "${message.text}"\n💬 Ma réponse : ${replyText}\n👉 Pose-moi une question :`,
-      url: publicUrl,
-    });
+    try {
+      const result = await shareCardToStatus({
+        element: captureRef.current,
+        filename: `tchat-reply-${user.username}-${Date.now()}.png`,
+        title: 'Ma Réponse TCHAT Anonyme',
+        text: `✨ Question : "${message.text}"\n💬 Ma réponse : ${replyText}\n👉 Pose-moi une question :`,
+        url: publicUrl,
+      });
 
-    setIsGenerating(false);
+      setIsGenerating(false);
 
-    if (result.dataUrl) {
-      setGeneratedImageDataUrl(result.dataUrl);
+      if (result.dataUrl) {
+        setGeneratedImageDataUrl(result.dataUrl);
+        setCopiedLink(true);
+      } else {
+        alert("La génération de l'image a rencontré un souci. Votre lien a été copié dans le presse-papier !");
+      }
+    } catch (error) {
+      console.error("Error generating image:", error);
+      setIsGenerating(false);
+      alert("Une erreur est survenue lors de la création de l'image. Veuillez réessayer.");
     }
-    setCopiedLink(true);
   };
 
   const handleCopyLink = () => {
@@ -140,6 +191,20 @@ export const StoryGeneratorModal: React.FC<StoryGeneratorModalProps> = ({
             </div>
           </div>
 
+          {/* Sticker Picker Customizer */}
+          <div>
+            <label className="font-mono-caps text-xs text-[#5e5e5b] block mb-2 uppercase tracking-wider text-center font-semibold">
+              3. AJOUTER DES STICKERS & EMOJIS (OPTIONNEL)
+            </label>
+            <StickerPicker
+              placedStickers={stickers}
+              onAddSticker={handleAddSticker}
+              onRemoveSticker={handleRemoveSticker}
+              onClearAll={handleClearAllStickers}
+              onUpdateSticker={handleUpdateSticker}
+            />
+          </div>
+
           {/* Canvas Capture Box (9:16 Aspect) */}
           <div className="flex justify-center">
             <div
@@ -156,17 +221,20 @@ export const StoryGeneratorModal: React.FC<StoryGeneratorModalProps> = ({
               {/* Subtle 3D Ambient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/30 pointer-events-none" />
 
+              {/* Dynamic Placed Stickers Overlay */}
+              <StickerOverlay
+                stickers={stickers}
+                onRemoveSticker={handleRemoveSticker}
+                onUpdateSticker={handleUpdateSticker}
+              />
+
               {/* Top Watermark & 3D Badge */}
               <div className="relative z-10 flex items-center justify-between">
                 <div className="flex items-center gap-2 bg-white/70 backdrop-blur-md px-3 py-1 rounded-full border border-white/60 shadow-md">
                   <img 
-                    src="/src/assets/images/story_3d_secret_icon_1785200487740.jpg" 
-                    alt="3D Badge" 
-                    className="w-5 h-5 rounded-full object-cover shadow-xs"
-                    referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
+                    src="/favicon.png" 
+                    alt="TCHAT Badge" 
+                    className="w-4 h-4 rounded-full object-contain"
                   />
                   <span className="font-mono-caps text-[9px] font-bold tracking-widest text-[#0f172a] uppercase">
                     UNSAID ANONYME
@@ -279,14 +347,13 @@ export const StoryGeneratorModal: React.FC<StoryGeneratorModalProps> = ({
 
               {/* Action Buttons */}
               <div className="space-y-2">
-                <a
-                  href={generatedImageDataUrl}
-                  download={`tchat-reply-${user.username}-${Date.now()}.png`}
+                <button
+                  onClick={() => downloadImageDataUrl(generatedImageDataUrl, `tchat-reply-${user.username}-${Date.now()}.png`)}
                   className="w-full bg-[#25D366] text-slate-950 py-3.5 rounded-2xl font-display font-bold text-xs flex items-center justify-center gap-2 hover:bg-[#20bd5a] active:scale-98 transition-all shadow-md text-center"
                 >
                   <span className="material-symbols-outlined text-lg">download</span>
-                  <span>TÉLÉCHARGER L'IMAGE PNG (HD)</span>
-                </a>
+                  <span>TÉLÉCHARGER MON IMAGE STORY (PNG HD)</span>
+                </button>
 
                 <button
                   onClick={handleCopyLink}

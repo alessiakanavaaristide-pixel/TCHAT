@@ -130,7 +130,7 @@ export const InboxView: React.FC<InboxViewProps> = ({
               className="w-full bg-gradient-to-r from-emerald-500 via-teal-500 to-green-600 text-white font-display font-bold text-base py-4 rounded-2xl shadow-lg hover:opacity-95 active:scale-98 transition-all flex items-center justify-center gap-2 ring-2 ring-emerald-300/50"
             >
               <span className="material-symbols-outlined text-2xl">photo_camera</span>
-              <span>GÉNÉRER MA CARTE DE STATUT NGL</span>
+              <span>GÉNÉRER MON IMAGE STORY (STATUT / INSTA)</span>
             </button>
 
             <div className="grid grid-cols-2 gap-2">
