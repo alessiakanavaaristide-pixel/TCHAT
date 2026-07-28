@@ -1,0 +1,6 @@
+{
+  "name": "TCHAT",
+  "description": "Plateforme de messages anonymes TCHAT - recevez des messages et des questions 100% anonymes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
