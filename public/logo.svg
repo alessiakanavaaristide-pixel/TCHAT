@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 64" width="260" height="64">
+  <!-- Speech bubble outline -->
+  <g transform="translate(6, 6)">
+    <path d="M 12 6 C 5 6, 0 11, 0 20 L 0 34 C 0 43, 5 48, 12 48 L 14 48 L 7 58 C 6 60, 8 62, 10 61 L 27 48 L 40 48 C 47 48, 52 43, 52 34 L 52 20 C 52 11, 47 6, 40 6 Z" 
+          fill="none" stroke="#111111" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- Text TCHAT -->
+  <text x="74" y="44" font-family="'Georgia', 'Times New Roman', serif" font-size="38" font-weight="800" fill="#111111" letter-spacing="2">TCHAT</text>
+</svg>

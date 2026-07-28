@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <rect width="128" height="128" rx="28" fill="#111111"/>
+  <!-- Speech bubble white stroke -->
+  <path d="M 28 32 C 18 32, 12 38, 12 50 L 12 70 C 12 82, 18 88, 28 88 L 32 88 L 20 106 C 18 109, 22 112, 25 109 L 52 88 L 76 88 C 86 88, 92 82, 92 70 L 92 50 C 92 38, 86 32, 76 32 Z" 
+        fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

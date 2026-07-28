@@ -27,12 +27,15 @@ export const InviteStoryModal: React.FC<InviteStoryModalProps> = ({ user, onClos
   const [showStatusGuide, setShowStatusGuide] = useState(false);
   const [statusResult, setStatusResult] = useState<{ downloaded: boolean; copiedLink: boolean } | null>(null);
 
+  const [generatedImageDataUrl, setGeneratedImageDataUrl] = useState<string | null>(null);
+  const [copiedLink, setCopiedLink] = useState(false);
+
   const captureRef = useRef<HTMLDivElement>(null);
   const themeConfig = THEMES[storyTheme] || THEMES.iridescent;
   const publicUrl = `${window.location.origin}/u/${user.username}`;
   const displayPrompt = isCustom ? (customPrompt || "Pose-moi une question...") : selectedPrompt;
 
-  const handleShareToWhatsAppStatus = async () => {
+  const handleGenerateAndExport = async () => {
     if (!captureRef.current) return;
     setIsProcessing(true);
 
@@ -46,35 +49,16 @@ export const InviteStoryModal: React.FC<InviteStoryModalProps> = ({ user, onClos
 
     setIsProcessing(false);
 
-    if (result.sharedNatively) {
-      // Shared natively via OS share dialog directly to WhatsApp Status or Instagram
-      return;
+    if (result.dataUrl) {
+      setGeneratedImageDataUrl(result.dataUrl);
     }
-
-    // Fallback: Image downloaded + link copied
-    setStatusResult({ downloaded: result.downloaded, copiedLink: result.copiedLink });
-    setShowStatusGuide(true);
-
-    // Open WhatsApp
-    setTimeout(() => {
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(`✨ ${displayPrompt}\n👉 Réponds-moi ici anonymement : ${publicUrl}`)}`, '_blank');
-    }, 800);
+    setCopiedLink(true);
   };
 
-  const handleDownloadOnly = async () => {
-    if (!captureRef.current) return;
-    setIsProcessing(true);
-
-    await shareCardToStatus({
-      element: captureRef.current,
-      filename: `tchat-status-${user.username}-${Date.now()}.png`,
-      title: 'Mon Statut TCHAT Anonyme',
-      text: displayPrompt,
-      url: publicUrl,
-    });
-
-    setIsProcessing(false);
-    alert("Image 9:16 enregistrée dans votre galerie !");
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(publicUrl);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
   };
 
   return (
@@ -259,93 +243,93 @@ export const InviteStoryModal: React.FC<InviteStoryModalProps> = ({ user, onClos
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="space-y-2 pt-2">
-            <button
-              onClick={handleShareToWhatsAppStatus}
-              disabled={isProcessing}
-              className="w-full bg-[#25D366] text-white py-3.5 rounded-2xl font-display font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#20bd5a] active:scale-98 transition-all shadow-lg"
-            >
-              <span className="material-symbols-outlined text-xl">share</span>
-              <span>{isProcessing ? 'Génération de l\'image...' : 'PUBLIER SUR STATUT WHATSAPP'}</span>
-            </button>
+          {/* Generated Image Preview or Customizer View */}
+          {generatedImageDataUrl ? (
+            <div className="space-y-4">
+              <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-2xl flex items-center gap-2 text-xs text-emerald-900 font-semibold">
+                <span className="material-symbols-outlined text-emerald-600 text-xl">check_circle</span>
+                <span>Votre carte 9:16 HD est générée et votre lien est copié !</span>
+              </div>
 
-            <button
-              onClick={handleDownloadOnly}
-              disabled={isProcessing}
-              className="w-full bg-slate-100 text-slate-800 border border-slate-300 py-3 rounded-2xl font-display font-semibold text-xs flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors"
-            >
-              <span className="material-symbols-outlined text-base">download</span>
-              <span>Télécharger l'image de la carte (HD)</span>
-            </button>
-          </div>
-        </div>
+              {/* Display Generated Photo PNG */}
+              <div className="relative group flex flex-col items-center">
+                <img
+                  src={generatedImageDataUrl}
+                  alt="Carte Statut NGL"
+                  className="w-full max-w-[260px] aspect-[9/16] rounded-2xl shadow-2xl object-contain mx-auto border border-slate-200 bg-black/5"
+                />
+                <p className="text-[10px] text-[#5e5e5b] font-mono-caps uppercase mt-2 text-center">
+                  💡 Astuce : Appuyez longuement sur l'image ci-dessus pour l'enregistrer dans vos photos
+                </p>
+              </div>
 
-        {/* Status Share Step-by-Step Instructions Modal Overlay */}
-        <AnimatePresence>
-          {showStatusGuide && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="p-5 bg-slate-900 text-white rounded-t-3xl space-y-4 border-t-2 border-[#25D366]"
-            >
-              <div className="flex items-center justify-between">
+              {/* Instructions for WhatsApp Status */}
+              <div className="bg-slate-900 text-white p-4 rounded-2xl space-y-3">
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-2xl text-[#25D366]">check_circle</span>
-                  <h3 className="font-display font-bold text-sm text-white">
-                    Carte prêt pour Statut WhatsApp !
-                  </h3>
+                  <span className="material-symbols-outlined text-[#25D366] text-xl">camera</span>
+                  <h4 className="font-display font-bold text-xs uppercase tracking-wider text-white">
+                    3 Étapes pour publier sur WhatsApp Statut :
+                  </h4>
                 </div>
-                <button
-                  onClick={() => setShowStatusGuide(false)}
-                  className="text-slate-400 hover:text-white"
+                <div className="space-y-2 text-xs font-body text-slate-300">
+                  <div className="flex items-start gap-2">
+                    <span className="w-5 h-5 rounded-full bg-[#25D366] text-slate-950 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">1</span>
+                    <p><strong className="text-white">Téléchargez l'image</strong> ci-dessus dans la galerie de votre téléphone.</p>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="w-5 h-5 rounded-full bg-[#25D366] text-slate-950 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">2</span>
+                    <p><strong className="text-white">Copiez le lien de votre profil :</strong> <span className="text-pink-300 font-mono text-[11px] underline break-all">{publicUrl}</span></p>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="w-5 h-5 rounded-full bg-[#25D366] text-slate-950 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">3</span>
+                    <p>Ouvrez <strong className="text-white">WhatsApp &gt; Statut</strong>, touchez l'icône <strong className="text-white">Appareil Photo</strong>, sélectionnez cette image et collez votre lien en légende !</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-2">
+                <a
+                  href={generatedImageDataUrl}
+                  download={`tchat-status-${user.username}-${Date.now()}.png`}
+                  className="w-full bg-[#25D366] text-slate-950 py-3.5 rounded-2xl font-display font-bold text-xs flex items-center justify-center gap-2 hover:bg-[#20bd5a] active:scale-98 transition-all shadow-md text-center"
                 >
-                  <span className="material-symbols-outlined text-lg">close</span>
+                  <span className="material-symbols-outlined text-lg">download</span>
+                  <span>TÉLÉCHARGER L'IMAGE PNG (HD)</span>
+                </a>
+
+                <button
+                  onClick={handleCopyLink}
+                  className="w-full bg-slate-800 text-white py-3 rounded-2xl font-display font-bold text-xs flex items-center justify-center gap-2 hover:bg-slate-700 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-base">content_copy</span>
+                  <span>{copiedLink ? '✓ LIEN COPIÉ DANS LE PRESSE-PAPIER' : 'COPIER LE LIEN SECRET'}</span>
+                </button>
+
+                <button
+                  onClick={() => setGeneratedImageDataUrl(null)}
+                  className="w-full bg-slate-100 text-slate-700 py-2.5 rounded-xl font-display font-semibold text-xs hover:bg-slate-200 transition-colors"
+                >
+                  Modiﬁer la couleur ou la question
                 </button>
               </div>
-
-              <div className="grid grid-cols-1 gap-2 text-xs font-body text-slate-300 bg-slate-800/80 p-3.5 rounded-2xl border border-slate-700">
-                <div className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-[#25D366] text-slate-950 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
-                    1
-                  </span>
-                  <p>
-                    <strong className="text-white">Image 9:16 enregistrée</strong> dans votre galerie photo.
-                  </p>
-                </div>
-
-                <div className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-[#25D366] text-slate-950 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
-                    2
-                  </span>
-                  <p>
-                    <strong className="text-white">Lien de votre profil copié :</strong> {publicUrl}
-                  </p>
-                </div>
-
-                <div className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-[#25D366] text-slate-950 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
-                    3
-                  </span>
-                  <p>
-                    Dans WhatsApp, touchez <strong className="text-white">Statut</strong> -&gt; Sélectionnez l'image téléchargée -&gt; Collez votre lien comme légende ou sticker.
-                  </p>
-                </div>
+            </div>
+          ) : (
+            <>
+              {/* Action Buttons */}
+              <div className="space-y-2 pt-2">
+                <button
+                  onClick={handleGenerateAndExport}
+                  disabled={isProcessing}
+                  className="w-full bg-[#25D366] text-white py-3.5 rounded-2xl font-display font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#20bd5a] active:scale-98 transition-all shadow-lg"
+                >
+                  <span className="material-symbols-outlined text-xl">photo_camera</span>
+                  <span>{isProcessing ? 'Génération de l\'image HD...' : 'GÉNÉRER MON IMAGE POUR STATUT WHATSAPP'}</span>
+                </button>
               </div>
-
-              <button
-                onClick={() => {
-                  setShowStatusGuide(false);
-                  onClose();
-                }}
-                className="w-full bg-[#25D366] text-slate-950 font-display font-bold text-xs py-3 rounded-xl hover:bg-[#20bd5a] transition-colors"
-              >
-                C'est compris, fermer
-              </button>
-            </motion.div>
+            </>
           )}
-        </AnimatePresence>
+        </div>
       </motion.div>
     </div>
   );

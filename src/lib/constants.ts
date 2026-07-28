@@ -19,14 +19,13 @@ export const THEMES: Record<ColorTheme, ThemeConfig> = {
   iridescent: {
     id: 'iridescent',
     name: '3D Verre Iridescent',
-    bg: 'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)',
-    cardBg: 'rgba(255, 255, 255, 0.88)',
+    bg: 'linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #f97316 100%)',
+    cardBg: 'rgba(255, 255, 255, 0.95)',
     cardBorder: 'rgba(255, 255, 255, 0.95)',
     textPrimary: '#0f172a',
     textSecondary: '#475569',
-    accent: '#2563eb',
-    previewColor: '#93c5fd',
-    bgImage: '/src/assets/images/story_3d_bg_iridescent_1785200472531.jpg',
+    accent: '#ec4899',
+    previewColor: '#ec4899',
     glass: true
   },
   cyber3d: {

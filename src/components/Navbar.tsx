@@ -38,12 +38,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => onNavigate('/')} 
             className="flex items-center gap-2 text-left group"
           >
-            <span className="material-symbols-outlined text-[#1c1b1b] text-xl group-hover:scale-105 transition-transform">
-              chat_bubble
-            </span>
-            <span className="font-display font-extrabold text-2xl tracking-tight text-[#1c1b1b]">
-              TCHAT
-            </span>
+            <img 
+              src="/logo.svg" 
+              alt="TCHAT Logo" 
+              className="h-7 sm:h-8 w-auto group-hover:scale-105 transition-transform" 
+            />
           </button>
         )}
 

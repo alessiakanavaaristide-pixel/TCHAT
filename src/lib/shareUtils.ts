@@ -8,22 +8,52 @@ export interface ShareOptions {
   url: string;
 }
 
-export async function shareCardToStatus(options: ShareOptions): Promise<{
+export interface ShareResult {
   sharedNatively: boolean;
   downloaded: boolean;
   copiedLink: boolean;
-}> {
+  dataUrl: string;
+}
+
+export async function generateImagePng(element: HTMLElement): Promise<string> {
+  // Try high quality capture with skipFonts to avoid CORS crashes
+  try {
+    return await toPng(element, {
+      quality: 0.98,
+      pixelRatio: 2,
+      skipFonts: true,
+      cacheBust: true,
+    });
+  } catch (err) {
+    console.warn('High-res PNG capture failed, retrying simple capture:', err);
+  }
+
+  // Fallback capture
+  try {
+    return await toPng(element, {
+      quality: 0.9,
+      pixelRatio: 1.5,
+      skipFonts: true,
+    });
+  } catch (err2) {
+    console.error('All PNG capture attempts failed:', err2);
+    return '';
+  }
+}
+
+export async function shareCardToStatus(options: ShareOptions): Promise<ShareResult> {
   const { element, filename, title, text, url } = options;
 
+  let dataUrl = await generateImagePng(element);
   let blob: Blob | null = null;
-  let dataUrl = '';
 
-  try {
-    dataUrl = await toPng(element, { quality: 0.95, cacheBust: true });
-    const res = await fetch(dataUrl);
-    blob = await res.blob();
-  } catch (err) {
-    console.warn('Failed to capture PNG:', err);
+  if (dataUrl) {
+    try {
+      const res = await fetch(dataUrl);
+      blob = await res.blob();
+    } catch (e) {
+      console.warn('Failed to convert dataUrl to blob:', e);
+    }
   }
 
   // Always copy link to clipboard
@@ -45,25 +75,28 @@ export async function shareCardToStatus(options: ShareOptions): Promise<{
           title: title,
           text: `${text}\n${url}`,
         });
-        return { sharedNatively: true, downloaded: false, copiedLink };
+        return { sharedNatively: true, downloaded: false, copiedLink, dataUrl };
       } catch (shareErr: any) {
-        // User cancelled share or browser refused file share
         if (shareErr.name === 'AbortError') {
-          return { sharedNatively: false, downloaded: false, copiedLink };
+          return { sharedNatively: false, downloaded: false, copiedLink, dataUrl };
         }
       }
     }
   }
 
-  // Fallback: Download image file & open WhatsApp
+  // Fallback: Trigger browser download link
   if (dataUrl) {
-    const link = document.createElement('a');
-    link.download = filename;
-    link.href = dataUrl;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (dlErr) {
+      console.warn('Download link click failed:', dlErr);
+    }
   }
 
-  return { sharedNatively: false, downloaded: true, copiedLink };
+  return { sharedNatively: false, downloaded: !!dataUrl, copiedLink, dataUrl };
 }

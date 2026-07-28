@@ -1,0 +1,14 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#FAF8F5"/>
+  <g transform="translate(240, 185)">
+    <!-- Speech bubble outline -->
+    <path d="M 50 25 C 20 25, 0 45, 0 85 L 0 175 C 0 215, 20 235, 50 235 L 60 235 L 30 290 C 25 298, 32 305, 40 300 L 110 235 L 180 235 C 210 235, 230 215, 230 175 L 230 85 C 230 45, 210 25, 180 25 Z" 
+          fill="none" stroke="#111111" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- Text TCHAT -->
+  <text x="540" y="355" font-family="'Georgia', 'Times New Roman', serif" font-size="140" font-weight="700" fill="#111111" letter-spacing="6">TCHAT</text>
+  
+  <!-- Subtitle -->
+  <text x="545" y="415" font-family="'Inter', sans-serif" font-size="28" font-weight="600" fill="#666666" letter-spacing="3">MESSAGES ANONYMES</text>
+</svg>
